@@ -1,6 +1,6 @@
 # Simple C++ Qt4.8 Connect Five Game
 
-![Connect five](/images/connect-five.png) ![Connect five](/images/piskvorky.png)
+![Connect five](/images/connect-five.png) 
 
 ### Features
 * 2 players
