@@ -12,6 +12,7 @@
 #include "item.h"
 #include "board.h"
 #include <QString>
+#include <QInputDialog>
 
 namespace Ui {
 	class MainWindow;
@@ -39,6 +40,9 @@ public:
 	explicit MainWindow(char *argv[], int argc, QWidget *parent = NULL);//explicit zabrani implicitnimu pretypovani
 	~MainWindow();
 
+
+
+
 public slots:
 
 	/*!
@@ -59,6 +63,10 @@ public slots:
 	void displayStatus (int);
 	void setStatusBar (int);
 	void buttonPressHandle (int);
+
+
+	void ConnectToGame();
+	void startNetworkGame();
 
 private:
 

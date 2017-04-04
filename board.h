@@ -74,6 +74,7 @@ public:
 	explicit Board (char *argv[], int argc, QPixmap *, QPixmap *, QPixmap *, QWidget  *parent = NULL);
 	~Board ();
 
+	bool game;
 	gameType gameType;
 	Item::Type activeType;
 	Server *server;
@@ -184,7 +185,7 @@ private:
 	void addItem (int, int);
 	void unHighlight (void);
 
-	bool game;
+
 	Item::Type win;
 	Item::Type firstPlayer;
 

@@ -9,7 +9,7 @@ Server::Server (int MAX_X, int MAX_Y, int port, QObject *parent) : QObject(paren
 	this->MAX_Y=MAX_Y;
 }
 
-void Server::start ()//spusti se server mode
+bool Server::start ()//spusti se server mode
 {
 	this->tcpServer = new QTcpServer (this);//vytvoreni serveru
 	tcpServer->setMaxPendingConnections(1);
@@ -18,10 +18,12 @@ void Server::start ()//spusti se server mode
 		QMessageBox::critical(NULL, "Tic Tac Toe Server", "Unable to start the server, this port isn't available.");
 		dropConnection ();
 		cout << "Unable to start the server, this port isn't available." << endl;
-		exit (0);
-		return;
+		return 1;
 	}
+
 	connect(tcpServer, SIGNAL (newConnection ()), this, SLOT (clientService ()));
+
+	return 0;
 }
 
 void Server::clientService ()
@@ -148,6 +150,10 @@ bool Server::readFromClient () //cte z daneho sitoveho socketu
 
 bool Server::writeToClient (QString output)
 {
+	if(!socket->isValid() || !socket || !socket->isOpen()){//kontrola otevrenosti a validity socketu
+		return false;
+	}
+
 	if (socket){
 		socket->write (output.toAscii());
 		socket->flush ();

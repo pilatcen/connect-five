@@ -4,29 +4,29 @@
 
 MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (parent), ui(new Ui::MainWindow)
 {
-	ui->setupUi(this);
+	this->ui->setupUi(this);
 
-	circle=new QPixmap (":/images/white.png");
-	cross=new QPixmap (":/images/black.png");
-	empty=new QPixmap (":/images/empty.png");
+	this->circle=new QPixmap (":/images/white.png");
+	this->cross=new QPixmap (":/images/black.png");
+	this->empty=new QPixmap (":/images/empty.png");
 
 	this->setMinimumSize(26*MAX_X+80,26*MAX_Y+100);
-	array=new Board (argv, argc, empty, circle, cross, this);
-	ui->gridLayout->addWidget(array,2,0);
-	ui->gridLayout->setRowMinimumHeight (2, 26*MAX_Y);
-	ui->gridLayout->setColumnMinimumWidth(0, 26*MAX_X);
-	ui->label_turn->setFixedHeight(25);
-	ui->label_color->setFixedHeight(25);
-	ui->label_turn->setScaledContents(1);
-	ui->label_color->setScaledContents(1);
-	ui->pushButton->setMaximumWidth(100);
+	this->array=new Board (argv, argc, empty, circle, cross, this);
+	this->ui->gridLayout->addWidget(array,2,0);
+	this->ui->gridLayout->setRowMinimumHeight (2, 26*MAX_Y);
+	this->ui->gridLayout->setColumnMinimumWidth(0, 26*MAX_X);
+	this->ui->label_turn->setFixedHeight(25);
+	this->ui->label_color->setFixedHeight(25);
+	this->ui->label_turn->setScaledContents(1);
+	this->ui->label_color->setScaledContents(1);
+	this->ui->pushButton->setMaximumWidth(100);
 
-	ui->label_score->setAlignment(Qt::AlignCenter);
-	ui->label_score_black->setAlignment(Qt::AlignCenter);
-	ui->label_score_white->setAlignment(Qt::AlignCenter);
+	this->ui->label_score->setAlignment(Qt::AlignCenter);
+	this->ui->label_score_black->setAlignment(Qt::AlignCenter);
+	this->ui->label_score_white->setAlignment(Qt::AlignCenter);
 
-	ui->label_4->setPixmap(*circle);
-	ui->label_5->setPixmap(*cross);
+	this->ui->label_4->setPixmap(*circle);
+	this->ui->label_5->setPixmap(*cross);
 
 	//nastaveni titulku okna
 	if ((argc==3) && (QString(argv[1])=="server")){
@@ -42,74 +42,175 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 	connect (array, SIGNAL (NewGamePressed (int)), this, SLOT (buttonPressHandle (int)));
 	connect (ui->pushButton_moveBack, SIGNAL (clicked ()), array, SLOT (moveBackClicked (void)));
 
-	if (array->server){
-		connect (array->server, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
-		connect (array->server, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
-		connect (array->server, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+
+	connect (ui->actionNew_Network_Game, SIGNAL (triggered ()), this, SLOT (startNetworkGame()));
+	connect (ui->actionConnect_to_Game, SIGNAL (triggered ()), this, SLOT (ConnectToGame ()));
+
+	if (this->array->server){
 		setStatusBar (2);
-	}else if (array->client){
-		connect (array->client, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
-		connect (array->client, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
-		connect (array->client, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+	}else if (this->array->client){
 		setStatusBar (2);
 	}else{
-		displayStatus(array->activeType);
+		displayStatus(this->array->activeType);
 	}
 
 	//zobrazeni, kdo ma jakou barvu
-	if (array->gameType==Board::TYPE_SERVER){
-		ui->label_3->setText ("You are ");
-		ui->label_color->setPixmap (*circle);
-	}else if (array->gameType==Board::TYPE_CLIENT){
-		ui->label_color->setPixmap (*cross);
-		ui->label_3->setText ("You are ");
+	if (this->array->gameType==Board::TYPE_SERVER){
+		this->ui->label_3->setText ("You are ");
+		this->ui->label_color->setPixmap (*circle);
+	}else if (this->array->gameType==Board::TYPE_CLIENT){
+		this->ui->label_color->setPixmap (*cross);
+		this->ui->label_3->setText ("You are ");
 	}
 }
+
+void MainWindow::startNetworkGame(){
+
+	int port =0;
+
+
+	if (this->array->server){
+		//this->array->server->dropConnection();
+		delete this->array->server;
+	}
+	if (this->array->client){
+		this->array->client->dropConnection();
+		delete this->array->client;
+	}
+
+
+	bool ok;
+	port = QInputDialog::getInt(this, tr("Server port number"),
+									tr("Server port number:"), 4000, 0, 65535 ,1, &ok);
+
+
+	this->array->server=new Server (MAX_X, MAX_Y, port, this->array);
+
+	if (this->array->server->start() == 1){
+		return;
+	}
+
+	this->array->gameType=Board::TYPE_LOCAL;
+	this->array->reset();
+	setStatusBar (2);
+	this->array->gameType=Board::TYPE_SERVER;
+	this->array->game=0;
+
+	connect (this->array->server, SIGNAL(move(int, int)), this->array, SLOT(addItem_net (int, int)));
+	connect (this->array->server, SIGNAL(connectionStatus (int)), this->array, SLOT(setGame (int)));
+	connect (this->array->server, SIGNAL(NewGamePressed (int)), this->array, SLOT(setGame (int)));
+	connect (this->array->server, SIGNAL(reset_net ()), this->array, SLOT(reset_net()));
+	connect (this->array->server, SIGNAL(moveBack ()), this->array, SLOT(moveBack()));
+
+
+
+
+	connect (this->array->server, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
+	connect (this->array->server, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
+	connect (this->array->server, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+
+}
+
+void MainWindow::ConnectToGame(){
+	QHostAddress hostname;
+	bool ok1, ok2;
+	int port =0;
+
+	if (this->array->client){
+		this->array->client->dropConnection();
+		delete this->array->client;
+	}
+	if (this->array->server){
+		//this->array->server->dropConnection();
+		delete this->array->server;
+	}
+
+	QString address = QInputDialog::getText(this, tr("Server IP address"),
+											tr("Server IP address:"), QLineEdit::Normal,
+											"127.0.0.1", &ok1);
+	port = QInputDialog::getInt(this, tr("Server port number"),
+									tr("Server port number:"), 4000, 0, 65535, 1, &ok2);
+
+	if (ok1 && ok2 && !address.isEmpty() && port!=0){
+		if(!hostname.setAddress (address)){
+			QMessageBox::critical(NULL, "Invalid IP address", "You've entered an invalid IP address!");
+			cout << "Unable to start the client, you've entered an invalid IP address!." << endl;
+			exit (0);
+		}
+
+		this->array->client=new Client (MAX_X, MAX_Y, hostname, port, this->array);
+		if (this->array->client->start() == 1){
+			return;
+		}
+
+		this->array->gameType=Board::TYPE_LOCAL;
+		this->array->reset();
+		this->array->gameType=Board::TYPE_CLIENT;
+		this->array->game=0;
+		setStatusBar (2);
+
+
+
+		connect (this->array->client, SIGNAL(move(int, int)), this->array, SLOT(addItem_net (int, int)));
+		connect (this->array->client, SIGNAL(connectionStatus (int)), this->array, SLOT(setGame (int)));
+		connect (this->array->client, SIGNAL(NewGamePressed (int)), this->array, SLOT(setGame (int)));
+		connect (this->array->client, SIGNAL(reset_net ()), this->array, SLOT(reset_net()));
+		connect (this->array->client, SIGNAL(moveBack ()), this->array, SLOT(moveBack ()));
+
+
+
+		connect (this->array->client, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
+		connect (this->array->client, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
+		connect (this->array->client, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+	}
+}
+
+
 
 void MainWindow::setStatusBar (int x)
 {
 	switch (x){
 	case 0:
-		ui->statusBar->showMessage ("Peer disconnected");
+		this->ui->statusBar->showMessage ("Peer disconnected");
 		break;
 
 	case 1:
-		ui->statusBar->showMessage ("Peer connected");
+		this->ui->statusBar->showMessage ("Peer connected");
 
-		if (array->activeType==Item::TYPE_CIRCLE){
-			ui->label_turn->setPixmap (*circle);
+		if (this->array->activeType==Item::TYPE_CIRCLE){
+			this->ui->label_turn->setPixmap (*circle);
 		}else{
-			ui->label_turn->setPixmap (*cross);
+			this->ui->label_turn->setPixmap (*cross);
 		}
-		ui->label_2->setText (" plays");
+		this->ui->label_2->setText (" plays");
 
 		break;
 	case 2:
-		ui->statusBar->showMessage ("Waiting for peer");
+		this->ui->statusBar->showMessage ("Waiting for peer");
 		break;
 
 	case 3:
-		ui->statusBar->showMessage ("White won");
-		ui->label_score_white->setText(QString::number (array->score[0]));
+		this->ui->statusBar->showMessage ("White won");
+		this->ui->label_score_white->setText(QString::number (array->score[0]));
 		//QMessageBox::information(NULL, "White won", "White won");
 		break;
 
 	case 4:
-		ui->statusBar->showMessage ("Black won");
-		ui->label_score_black->setText (QString::number (array->score[1]));
+		this->ui->statusBar->showMessage ("Black won");
+		this->ui->label_score_black->setText (QString::number (array->score[1]));
 		//QMessageBox::information(NULL, "Black won", "Black won");
 		break;
 
 	case 5:
-		ui->statusBar->showMessage ("Draw");
-		ui->label_score_white->setText (QString::number (array->score[0]));
-		ui->label_score_black->setText (QString::number (array->score[1]));
+		this->ui->statusBar->showMessage ("Draw");
+		this->ui->label_score_white->setText (QString::number (array->score[0]));
+		this->ui->label_score_black->setText (QString::number (array->score[1]));
 		//QMessageBox::information(NULL, "Draw", "Draw");
 		break;
 	case 6:
-		ui->statusBar->showMessage ("Draw");
-		ui->label_score_white->setText (QString::number (array->score[0]));
-		ui->label_score_black->setText (QString::number (array->score[1]));
+		this->ui->statusBar->showMessage ("Draw");
+		this->ui->label_score_white->setText (QString::number (array->score[0]));
+		this->ui->label_score_black->setText (QString::number (array->score[1]));
 		//QMessageBox::information(NULL, "Draw", "Draw");
 		break;
 	}
@@ -120,41 +221,41 @@ void MainWindow::displayStatus (int event)
 {
 	switch (event){
 	case 1:
-		ui->label_turn->setPixmap (*circle);
-		ui->label_2->setText (" plays");
+		this->ui->label_turn->setPixmap (*circle);
+		this->ui->label_2->setText (" plays");
 		break;
 	case 2:
-		ui->label_turn->setPixmap (*cross);
-		ui->label_2->setText (" plays");
+		this->ui->label_turn->setPixmap (*cross);
+		this->ui->label_2->setText (" plays");
 		break;
 	case 7:
-		ui->statusBar->showMessage ("");
+		this->ui->statusBar->showMessage ("");
 		break;
 	case 8:
-		ui->statusBar->showMessage ("Your opponent accepted your offeer.");
+		this->ui->statusBar->showMessage ("Your opponent accepted your offeer.");
 		break;
 	case 9:
-		ui->statusBar->showMessage ("Your opponent rejected your offer.");
+		this->ui->statusBar->showMessage ("Your opponent rejected your offer.");
 		break;
 	case 10:
-		ui->statusBar->showMessage ("Asking your opponent...");
+		this->ui->statusBar->showMessage ("Asking your opponent...");
 		break;
 	case 11:
-		ui->statusBar->showMessage ("You can't take back your move if the game is over.");
+		this->ui->statusBar->showMessage ("You can't take back your move if the game is over.");
 		break;
 	default:
 		//ui->label->setPixmap(empty);
-		ui->label_turn->setText ("Game Over");
-		ui->label_2->clear ();
+		this->ui->label_turn->setText ("Game Over");
+		this->ui->label_2->clear ();
 		//ui->label_3->clear();
-		setStatusBar (event);
+		this->setStatusBar (event);
 	}
 }
 
 void MainWindow::buttonPressHandle (int x)
 {
-	ui->pushButton->setEnabled ((bool)x);
-	ui->pushButton_moveBack->setEnabled ((bool)x);
+	this->ui->pushButton->setEnabled ((bool)x);
+	this->ui->pushButton_moveBack->setEnabled ((bool)x);
 }
 
 MainWindow::~MainWindow ()

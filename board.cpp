@@ -22,6 +22,13 @@ Board::Board (char *argv[], int argc, QPixmap *empty, QPixmap *circle, QPixmap *
 
 		server->start();
 
+
+		connect (this->server, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
+		connect (this->server, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
+		connect (this->server, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+
+
+
 	}else if (argc==4 && (QString (argv[1])=="client")){
 
 		QHostAddress hostname;
@@ -43,6 +50,11 @@ Board::Board (char *argv[], int argc, QPixmap *empty, QPixmap *circle, QPixmap *
 		connect (client, SIGNAL(reset_net ()), this, SLOT(reset_net()));
 		connect (client, SIGNAL(moveBack ()), this, SLOT(moveBack ()));
 		client->start();
+
+
+		connect (this->client, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
+		connect (this->client, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
+		connect (this->client, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
 
 	}else{
 		gameType=TYPE_LOCAL;

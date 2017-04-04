@@ -10,11 +10,19 @@ Client::Client (int MAX_X, int MAX_Y, const QHostAddress hostname, int port, QOb
 	this->MAX_Y=MAX_Y;
 }
 
-void Client::start ()
+bool Client::start()
 {
 	this->socket = new QTcpSocket(this);
 	socket->connectToHost (hostname, this->port);
+
+	if (!socket->isValid() || !socket->isOpen()){
+		return 1;
+	}
+
+
 	connect(socket, SIGNAL(connected()), this, SLOT(serverService()));
+
+	return 0;
 }
 
 void Client::serverService ()

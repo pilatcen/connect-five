@@ -40,7 +40,7 @@ public:
 	 */
 
 	explicit Client (int MAX_X, int MAX_Y, const QHostAddress hostname, int port, QObject *parent=NULL);
-	void start (void);
+	bool start (void);
 	bool writeToServer (QString);
 
 signals:

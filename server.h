@@ -43,7 +43,7 @@ public:
 
 	explicit Server (int MAX_X, int MAX_Y, int port, QObject *parent = NULL);
 	bool writeToClient (QString output);
-	void start ();
+	bool start ();
 
 signals:
 
