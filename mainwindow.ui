@@ -37,7 +37,7 @@
             <bool>true</bool>
            </property>
            <property name="text">
-            <string>Reset Game</string>
+            <string> Reset Game </string>
            </property>
           </widget>
          </item>

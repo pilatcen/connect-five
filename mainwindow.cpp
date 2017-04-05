@@ -72,10 +72,12 @@ void MainWindow::startNetworkGame(){
 	if (this->array->server){
 		//this->array->server->dropConnection();
 		delete this->array->server;
+		this->array->server = NULL;
 	}
 	if (this->array->client){
-		this->array->client->dropConnection();
+		//this->array->client->dropConnection();
 		delete this->array->client;
+		this->array->client = NULL;
 	}
 
 
@@ -117,12 +119,14 @@ void MainWindow::ConnectToGame(){
 	int port =0;
 
 	if (this->array->client){
-		this->array->client->dropConnection();
+		//this->array->client->dropConnection();
 		delete this->array->client;
+		this->array->client = NULL;
 	}
 	if (this->array->server){
 		//this->array->server->dropConnection();
 		delete this->array->server;
+		this->array->server = NULL;
 	}
 
 	QString address = QInputDialog::getText(this, tr("Server IP address"),
