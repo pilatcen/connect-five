@@ -74,6 +74,7 @@ public:
 	explicit Board (char *argv[], int argc, QPixmap *, QPixmap *, QPixmap *, QWidget  *parent = NULL);
 	~Board ();
 
+	bool game;
 	gameType gameType;
 	Item::Type activeType;
 	Server *server;
@@ -93,8 +94,8 @@ signals:
 	 *  \param[in] x zakazuje/povoluje tlačítka v okně
 	 *
 	 */
-	void statusChanged (int);
-	void NewGamePressed (int);
+	void statusChanged (const int&);
+	void NewGamePressed (const int&);
 
 public slots:
 	/*!
@@ -121,8 +122,8 @@ public slots:
 	 */
 	void reset (void);
 	void reset_net (void);
-	void addItem_net (int, int);
-	void setGame (int);
+	void addItem_net (const int &, const int &);
+	void setGame (const int&);
 	void moveBack (void);
 	void moveBackClicked (void);
 
@@ -180,11 +181,11 @@ private:
 	 * \brief Ukazatel na obrázek prázdného pole
 	 */
 
-	bool testwin (int, int);
-	void addItem (int, int);
+	bool testwin (const int&, const int&);
+	void addItem (const int&, const int&);
 	void unHighlight (void);
 
-	bool game;
+
 	Item::Type win;
 	Item::Type firstPlayer;
 

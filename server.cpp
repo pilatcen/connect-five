@@ -1,7 +1,7 @@
 #include "server.h"
 
 
-Server::Server (int MAX_X, int MAX_Y, int port, QObject *parent) : QObject(parent)
+Server::Server (const int &MAX_X, const int &MAX_Y, const int &port, QObject *parent) : QObject(parent)
 {
 	this->socket=NULL;
 	this->port=port;
@@ -9,47 +9,49 @@ Server::Server (int MAX_X, int MAX_Y, int port, QObject *parent) : QObject(paren
 	this->MAX_Y=MAX_Y;
 }
 
-void Server::start ()//spusti se server mode
+bool Server::start ()//spusti se server mode
 {
 	this->tcpServer = new QTcpServer (this);//vytvoreni serveru
-	tcpServer->setMaxPendingConnections(1);
+	this->tcpServer->setMaxPendingConnections(1);
 
-	if (!tcpServer->listen (QHostAddress::Any, this->port)){//testovani jestli muzu poslouchat na danym portu
+	if (!this->tcpServer->listen (QHostAddress::Any, this->port)){//testovani jestli muzu poslouchat na danym portu
 		QMessageBox::critical(NULL, "Tic Tac Toe Server", "Unable to start the server, this port isn't available.");
-		dropConnection ();
+		this->dropConnection ();
 		cout << "Unable to start the server, this port isn't available." << endl;
-		exit (0);
-		return;
+		return 1;
 	}
-	connect(tcpServer, SIGNAL (newConnection ()), this, SLOT (clientService ()));
+
+	connect(this->tcpServer, SIGNAL (newConnection ()), this, SLOT (clientService ()));
+
+	return 0;
 }
 
 void Server::clientService ()
 {
-	if (!socket){////////pokud je hra jiz vytvorena, nesmi se pripojit nikdo dalsi
-		socket = tcpServer->nextPendingConnection();//ziskani socketu serveru
-		connect(socket, SIGNAL (disconnected ()), this, SLOT (dropConnection (void)));
-		connect(socket, SIGNAL (readyRead ()), this, SLOT (handleClient ()));
+	if (!this->socket){////////pokud je hra jiz vytvorena, nesmi se pripojit nikdo dalsi
+		this->socket = this->tcpServer->nextPendingConnection();//ziskani socketu serveru
+		connect(this->socket, SIGNAL (disconnected ()), this, SLOT (dropConnection (void)));
+		connect (this->socket, SIGNAL (readyRead ()), this, SLOT (handleClient ()));
 
 		//writeToClient("100 "+QString::number(MAX_X)+" "+QString::number(MAX_Y)+"\n");//zasle velikost sachovnice
-		emit connectionStatus (1);
+		emit this->connectionStatus (1);
 	}
 }
 
 void Server::handleClient ()
 {
-	readFromClient ();
+	this->readFromClient ();
 	//cout << buffer.toLatin1().data() <<endl;
 
-	if(!parseMessage ()){
-		dropConnection ();
-		start ();
+	if(!this->parseMessage ()){
+		this->dropConnection ();
+		this->start ();
 	}
 }
 
 bool Server::parseMessage ()
 {
-	QStringList p = buffer.split(" ");
+	QStringList p = this->buffer.split(" ");
 
 	if(p.length() != 3){//zajisteni dodrzeni protokolu
 		QMessageBox::critical (NULL, "Tic Tac Toe Server", "Client don't use our protocol!");
@@ -65,7 +67,7 @@ bool Server::parseMessage ()
 		}
 		break;
 	case 200:
-		emit move (p[1].toInt (), p[2].toInt ());
+		emit this->move (p[1].toInt (), p[2].toInt ());
 		break;
 	case 300:
 
@@ -74,59 +76,59 @@ bool Server::parseMessage ()
 
 			switch (MsgDialog ("Your opponent wants to reset game.")){
 				case QMessageBox::Yes:
-					writeToClient("300 1 1\n");
+					this->writeToClient("300 1 1\n");
 					emit reset_net ();
 				   break;
 				case QMessageBox::No:
-				   writeToClient("300 0 0\n");
+				   this->writeToClient("300 0 0\n");
 				   break;
 			}
 			break;
 		case 1:
-			emit reset_net ();
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->reset_net ();
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game reseted.", "Your opponent accepted your offeer.");
-			statusChanged (8);
+			this->statusChanged (8);
 			break;
 		case 0:
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game wasn't reseted.", "Your opponent rejected your offer.");
-			emit statusChanged (9);
+			emit this->statusChanged (9);
 			break;
 		case 200:
 
 			switch (MsgDialog ("Your opponent wants to take his move back.")){
 				case QMessageBox::Yes:
-					writeToClient("300 20 20\n");
-					emit moveBack ();
+					this->writeToClient("300 20 20\n");
+					emit this->moveBack ();
 				   break;
 				case QMessageBox::No:
-				   writeToClient("300 30 30\n");
+				   this->writeToClient("300 30 30\n");
 				   break;
 			}
 
 			break;
 		case 20:
-			emit moveBack ();
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->moveBack ();
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game reseted.", "Your opponent accepted your offeer.");
-			emit statusChanged (8);
+			emit this->statusChanged (8);
 			break;
 		case 30:
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game wasn't reseted.", "Your opponent rejected your offer.");
-			emit statusChanged (9);
+			emit this->statusChanged (9);
 			break;
 
 		}
 
 		break;
 	case 400:
-		emit reset_net ();
+		emit this->reset_net ();
 		break;
 	}
 	return true;
@@ -134,23 +136,27 @@ bool Server::parseMessage ()
 
 bool Server::readFromClient () //cte z daneho sitoveho socketu
 {
-	QByteArray line=socket->readLine().trimmed();
+	QByteArray line=this->socket->readLine().trimmed();
 
 	if(!line.isEmpty ()){
-		buffer = QString (line);
+		this->buffer = QString (line);
 		return true;
 	}
 	QMessageBox::critical (NULL, "Tic Tac Toe Server", "Invalid read");
-	dropConnection ();
-	start ();
+	this->dropConnection ();
+	this->start ();
 	return false;
 }
 
-bool Server::writeToClient (QString output)
+bool Server::writeToClient (const QString &output)
 {
-	if (socket){
-		socket->write (output.toAscii());
-		socket->flush ();
+	if(!this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
+		return false;
+	}
+
+	if (this->socket){
+		this->socket->write (output.toAscii());
+		this->socket->flush ();
 		return true;
 	}else{
 		//QMessageBox::critical(NULL, "Tic Tac Toe Server", "Nobody has connected yet!");
@@ -158,7 +164,7 @@ bool Server::writeToClient (QString output)
 	}
 }
 
-int Server::MsgDialog (QString message)
+int Server::MsgDialog (const QString &message)
 {
 	QMessageBox msgBox;
 	msgBox.setText(message);

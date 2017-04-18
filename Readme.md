@@ -14,7 +14,7 @@
 * libqtcore4
 * libqt4-network
 
-### Compilation Dependencies on Debian, Ubuntu (for Qt4, for Qt5 is it similar)
+### Compilation Dependencies on Debian, Ubuntu (for Qt4)
 * qt4-qmake
 * libqt4-dev
 * build-essential
@@ -26,13 +26,4 @@
 * 2 players on one PC:
 ```
 ./piskvorky
-```
-* Network game:
-   1. Start server - server-port is number of free TCP port
-```
-./piskvorky server server-port
-```
-   2. And then connect your client to it - server-ip is ip of your server and server-port is port number which your server is listening on:
-```
-./piskvorky client server-ip server-port 
 ```

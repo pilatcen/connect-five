@@ -40,7 +40,7 @@ public:
 		TYPE_CROSS=2
 	};
 
-	explicit Item (int, int, QPixmap *, Board *parent = NULL);
+	explicit Item (const int &, const int &, QPixmap *, Board *parent = NULL);
 
 signals:
 public slots:

@@ -39,8 +39,8 @@ public:
 	 *
 	 */
 
-	explicit Client (int MAX_X, int MAX_Y, const QHostAddress hostname, int port, QObject *parent=NULL);
-	void start (void);
+	explicit Client (const int &MAX_X, const int &MAX_Y, const QHostAddress &hostname, const int &port, QObject *parent=NULL);
+	bool start (void);
 	bool writeToServer (QString);
 
 signals:
@@ -76,13 +76,13 @@ signals:
 	 *
 	 */
 
-	void move (int, int);
-	void connectionStatus (int);
+	void move (const int&, const int&);
+	void connectionStatus (const int&);
 	void reset_net (void);
-	void NewGamePressed (int);
+	void NewGamePressed (const int&);
 	void moveBack (void);
-	void statusChanged (int);
-	void buttonPressed (int);
+	void statusChanged (const int&);
+	void buttonPressed (const int&);
 
 public slots:
 

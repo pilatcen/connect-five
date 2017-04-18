@@ -12,6 +12,7 @@
 #include "item.h"
 #include "board.h"
 #include <QString>
+#include <QInputDialog>
 
 namespace Ui {
 	class MainWindow;
@@ -19,7 +20,7 @@ namespace Ui {
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT //kvuli slotum (connect je metoda QObjectu)
+	Q_OBJECT //kvuli slotum (connect je metoda QObjectu), vsechny vytvorene objekty musi dedit z Q_OBJECT
 
 public:
 
@@ -36,8 +37,11 @@ public:
 	*/
 
 
-	explicit MainWindow(char *argv[], int argc, QWidget *parent = NULL);//explicit zabrani implicitnimu pretypovani
+	explicit MainWindow(char *argv[], const int argc, QWidget *parent = NULL);//explicit zabrani implicitnimu pretypovani
 	~MainWindow();
+
+
+
 
 public slots:
 
@@ -56,9 +60,13 @@ public slots:
 
 
 	 */
-	void displayStatus (int);
-	void setStatusBar (int);
-	void buttonPressHandle (int);
+	void displayStatus (const int &);
+	void setStatusBar (const int&);
+	void buttonPressHandle (const int&);
+
+
+	void ConnectToGame();
+	void startNetworkGame();
 
 private:
 
