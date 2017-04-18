@@ -37,7 +37,7 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 		this->setWindowTitle("Connect Five Game");
 	}
 
-	connect (array, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+	connect (array, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (const int&)));
 	connect (ui->pushButton, SIGNAL (clicked ()), array, SLOT (reset ()));
 	connect (array, SIGNAL (NewGamePressed (int)), this, SLOT (buttonPressHandle (int)));
 	connect (ui->pushButton_moveBack, SIGNAL (clicked ()), array, SLOT (moveBackClicked (void)));
@@ -47,11 +47,11 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 	connect (ui->actionConnect_to_Game, SIGNAL (triggered ()), this, SLOT (ConnectToGame ()));
 
 	if (this->array->server){
-		setStatusBar (2);
+		this->setStatusBar (2);
 	}else if (this->array->client){
-		setStatusBar (2);
+		this->setStatusBar (2);
 	}else{
-		displayStatus(this->array->activeType);
+		this->displayStatus(this->array->activeType);
 	}
 
 	//zobrazeni, kdo ma jakou barvu
@@ -68,7 +68,6 @@ void MainWindow::startNetworkGame(){
 
 	int port =0;
 
-
 	if (this->array->server){
 		//this->array->server->dropConnection();
 		delete this->array->server;
@@ -80,10 +79,9 @@ void MainWindow::startNetworkGame(){
 		this->array->client = NULL;
 	}
 
-
 	bool ok;
 	port = QInputDialog::getInt(this, tr("Server port number"),
-									tr("Server port number:"), 4000, 0, 65535 ,1, &ok);
+								tr("Server port number:"), 4000, 0, 65535 ,1, &ok);
 
 	if (ok == false){
 		return;
@@ -98,7 +96,7 @@ void MainWindow::startNetworkGame(){
 
 	this->array->gameType=Board::TYPE_LOCAL;
 	this->array->reset();
-	setStatusBar (2);
+	this->setStatusBar (2);
 	this->array->gameType=Board::TYPE_SERVER;
 	this->array->game=0;
 
@@ -107,9 +105,6 @@ void MainWindow::startNetworkGame(){
 	connect (this->array->server, SIGNAL(NewGamePressed (int)), this->array, SLOT(setGame (int)));
 	connect (this->array->server, SIGNAL(reset_net ()), this->array, SLOT(reset_net()));
 	connect (this->array->server, SIGNAL(moveBack ()), this->array, SLOT(moveBack()));
-
-
-
 
 	connect (this->array->server, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
 	connect (this->array->server, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
@@ -155,8 +150,7 @@ void MainWindow::ConnectToGame(){
 		this->array->reset();
 		this->array->gameType=Board::TYPE_CLIENT;
 		this->array->game=0;
-		setStatusBar (2);
-
+		this->setStatusBar (2);
 
 
 		connect (this->array->client, SIGNAL(move(int, int)), this->array, SLOT(addItem_net (int, int)));
@@ -164,8 +158,6 @@ void MainWindow::ConnectToGame(){
 		connect (this->array->client, SIGNAL(NewGamePressed (int)), this->array, SLOT(setGame (int)));
 		connect (this->array->client, SIGNAL(reset_net ()), this->array, SLOT(reset_net()));
 		connect (this->array->client, SIGNAL(moveBack ()), this->array, SLOT(moveBack ()));
-
-
 
 		connect (this->array->client, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
 		connect (this->array->client, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
@@ -175,7 +167,7 @@ void MainWindow::ConnectToGame(){
 
 
 
-void MainWindow::setStatusBar (int x)
+void MainWindow::setStatusBar (const int &x)
 {
 	switch (x){
 	case 0:
@@ -225,7 +217,7 @@ void MainWindow::setStatusBar (int x)
 }
 
 
-void MainWindow::displayStatus (int event)
+void MainWindow::displayStatus (const int &event)
 {
 	switch (event){
 	case 1:
@@ -260,7 +252,7 @@ void MainWindow::displayStatus (int event)
 	}
 }
 
-void MainWindow::buttonPressHandle (int x)
+void MainWindow::buttonPressHandle (const int &x)
 {
 	this->ui->pushButton->setEnabled ((bool)x);
 	this->ui->pushButton_moveBack->setEnabled ((bool)x);

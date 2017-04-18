@@ -71,7 +71,7 @@ private:
 	 *
 	 */
 
-	void mousePressEvent (const QMouseEvent *);
+	void mousePressEvent (QMouseEvent *);
 	void clear (void);
 
 	int x,y;

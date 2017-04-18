@@ -13,12 +13,11 @@ Client::Client (const int &MAX_X, const int &MAX_Y, const QHostAddress &hostname
 bool Client::start()
 {
 	this->socket = new QTcpSocket(this);
-	socket->connectToHost (hostname, this->port);
+	this->socket->connectToHost (hostname, this->port);
 
-	if (!socket->isValid() || !socket->isOpen()){
+	if (!this->socket->isValid() || !this->socket->isOpen()){
 		return 1;
 	}
-
 
 	connect(socket, SIGNAL(connected()), this, SLOT(serverService()));
 
@@ -30,17 +29,17 @@ void Client::serverService ()
 	connect(socket, SIGNAL (readyRead ()), this, SLOT (handleServer ()));
 	connect(socket, SIGNAL (disconnected ()), this, SLOT (dropConnection ()));
 	//writeToServer ("100 "+QString::number(MAX_X)+" "+QString::number(MAX_Y)+"\n");
-	writeToServer ("400 400 400\n");//reset
-	emit connectionStatus (1);
+	this->writeToServer ("400 400 400\n");//reset
+	emit this->connectionStatus (1);
 }
 
 void Client::handleServer ()
 {
-	readFromServer ();
+	this->readFromServer ();
 	//cout << buffer.toLatin1().data() <<endl;
 
-	if(!parseMessage ()){
-		dropConnection ();
+	if(!this->parseMessage ()){
+		this->dropConnection ();
 	}
 }
 
@@ -61,7 +60,7 @@ bool Client::parseMessage ()
 		}
 		break;
 	case 200:
-		emit move (p[1].toInt(), p[2].toInt());
+		emit this->move (p[1].toInt(), p[2].toInt());
 		break;
 	case 300:
 
@@ -70,58 +69,58 @@ bool Client::parseMessage ()
 
 			switch (MsgDialog ("Your opponent wants to reset game.")){
 				case QMessageBox::Yes:
-					writeToServer("300 1 1\n");
-					emit reset_net ();
+					this->writeToServer("300 1 1\n");
+					emit this->reset_net ();
 				   break;
 				case QMessageBox::No:
-				   writeToServer("300 0 0\n");
+				   this->writeToServer("300 0 0\n");
 				   break;
 			default:
 				   break;
 			}
 			break;
 		case 1:
-			emit reset_net ();
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->reset_net ();
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game reseted.", "Your opponent accepted your offeer.");
-			statusChanged (8);
+			this->statusChanged (8);
 			break;
 		case 0:
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game wasn't reseted.", "Your opponent rejected your offer.");
-			statusChanged (9);
+			this->statusChanged (9);
 			break;
 		case 200:
 
 			switch (MsgDialog ("Your opponent wants to take his move back.")){
 				case QMessageBox::Yes:
-					writeToServer("300 20 20\n");
-					emit moveBack ();
+					this->writeToServer("300 20 20\n");
+					emit this->moveBack ();
 				   break;
 				case QMessageBox::No:
-				   writeToServer("300 30 30\n");
+				   this->writeToServer("300 30 30\n");
 				   break;
 			}
 			break;
 		case 20:
-			emit moveBack ();
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->moveBack ();
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game reseted.", "Your opponent accepted your offeer.");
-			emit statusChanged (8);
+			emit this->statusChanged (8);
 			break;
 		case 30:
-			emit NewGamePressed (1);
-			emit buttonPressed (1);
+			emit this->NewGamePressed (1);
+			emit this->buttonPressed (1);
 			//QMessageBox::information(NULL, "Game wasn't reseted.", "Your opponent rejected your offer.");
-			emit statusChanged (9);
+			emit this->statusChanged (9);
 			break;
 		}
 		break;
 	case 400:
-		emit reset_net ();
+		emit this->reset_net ();
 		break;
 	}
 	return true;
@@ -129,14 +128,14 @@ bool Client::parseMessage ()
 
 bool Client::readFromServer ()
 {
-	if (socket){
+	if (this->socket){
 		QByteArray line;
 
-		if (!(line = socket->readLine().trimmed()).isEmpty()) {
-			buffer = QString(line);
+		if (!(line = this->socket->readLine().trimmed()).isEmpty()) {
+			this->buffer = QString(line);
 			return true;
 		}else{
-			dropConnection ();
+			this->dropConnection ();
 			return false;
 		}
 	}
@@ -145,11 +144,11 @@ bool Client::readFromServer ()
 
 bool Client::writeToServer (QString output)
 {
-	if(!socket->isValid() || !socket || !socket->isOpen()){//kontrola otevrenosti a validity socketu
+	if(!this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
 		return false;
 	}
-	socket->write (output.toAscii());
-	socket->flush ();
+	this->socket->write (output.toAscii());
+	this->socket->flush ();
 	return true;
 }
 
@@ -166,8 +165,8 @@ int Client::MsgDialog (QString message)
 void Client::dropConnection (void)
 {
 	emit connectionStatus (0);
-	if (socket){
-		socket->close ();
+	if (this->socket){
+		this->socket->close ();
 	}
-	socket=NULL;
+	this->socket=NULL;
 }

@@ -37,7 +37,7 @@ public:
 	*/
 
 
-	explicit MainWindow(char *argv[], int argc, QWidget *parent = NULL);//explicit zabrani implicitnimu pretypovani
+	explicit MainWindow(char *argv[], const int argc, QWidget *parent = NULL);//explicit zabrani implicitnimu pretypovani
 	~MainWindow();
 
 
@@ -60,9 +60,9 @@ public slots:
 
 
 	 */
-	void displayStatus (int);
-	void setStatusBar (int);
-	void buttonPressHandle (int);
+	void displayStatus (const int &);
+	void setStatusBar (const int&);
+	void buttonPressHandle (const int&);
 
 
 	void ConnectToGame();
