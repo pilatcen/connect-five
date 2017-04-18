@@ -1,7 +1,7 @@
 #include "client.h"
 
 
-Client::Client (int MAX_X, int MAX_Y, const QHostAddress hostname, int port, QObject *parent) : QObject(parent)
+Client::Client (const int &MAX_X, const int &MAX_Y, const QHostAddress &hostname, const int &port, QObject *parent) : QObject(parent)
 {
 	this->socket = NULL;
 	this->port=port;

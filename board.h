@@ -122,7 +122,7 @@ public slots:
 	 */
 	void reset (void);
 	void reset_net (void);
-	void addItem_net (int, int);
+	void addItem_net (const int &, const int &);
 	void setGame (int);
 	void moveBack (void);
 	void moveBackClicked (void);

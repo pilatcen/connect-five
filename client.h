@@ -39,7 +39,7 @@ public:
 	 *
 	 */
 
-	explicit Client (int MAX_X, int MAX_Y, const QHostAddress hostname, int port, QObject *parent=NULL);
+	explicit Client (const int &MAX_X, const int &MAX_Y, const QHostAddress &hostname, const int &port, QObject *parent=NULL);
 	bool start (void);
 	bool writeToServer (QString);
 

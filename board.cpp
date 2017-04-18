@@ -14,7 +14,7 @@ Board::Board (char *argv[], int argc, QPixmap *empty, QPixmap *circle, QPixmap *
 
 		server=new Server (MAX_X, MAX_Y, QString (argv[2]).toInt(), this);
 
-		connect (server, SIGNAL(move(int, int)), this, SLOT(addItem_net (int, int)));
+		connect (server, SIGNAL(move(const int &, const int &)), this, SLOT(addItem_net (const int &, const int &)));
 		connect (server, SIGNAL(connectionStatus (int)), this, SLOT(setGame (int)));
 		connect (server, SIGNAL(NewGamePressed (int)), this, SLOT(setGame (int)));
 		connect (server, SIGNAL(reset_net ()), this, SLOT(reset_net()));
@@ -44,7 +44,7 @@ Board::Board (char *argv[], int argc, QPixmap *empty, QPixmap *circle, QPixmap *
 
 		client=new Client (MAX_X, MAX_Y, hostname, QString (argv[3]).toInt(), this);
 
-		connect (client, SIGNAL(move(int, int)), this, SLOT(addItem_net (int, int)));
+		connect (client, SIGNAL(move(const int &, const int &)), this, SLOT(addItem_net (const int &, const int &)));
 		connect (client, SIGNAL(connectionStatus (int)), this, SLOT(setGame (int)));
 		connect (client, SIGNAL(NewGamePressed (int)), this, SLOT(setGame (int)));
 		connect (client, SIGNAL(reset_net ()), this, SLOT(reset_net()));
@@ -99,7 +99,7 @@ void Board::unHighlight (void)//stara se o zruseni zvyrazneni posledniho tahu
 	}
 }
 
-void Board::addItem_net (int x, int y)
+void Board::addItem_net (const int &x, const int &y)
 {
 	if (x<MAX_X && y<MAX_Y && x>-1 && y>-1){
 		if (server && ((int)items[y][x]->type==(int)Item::TYPE_EMPTY) && game && ((int)this->activeType==(int)TYPE_CLIENT)){

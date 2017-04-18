@@ -20,7 +20,7 @@ namespace Ui {
 
 class MainWindow : public QMainWindow
 {
-	Q_OBJECT //kvuli slotum (connect je metoda QObjectu)
+	Q_OBJECT //kvuli slotum (connect je metoda QObjectu), vsechny vytvorene objekty musi dedit z Q_OBJECT
 
 public:
 

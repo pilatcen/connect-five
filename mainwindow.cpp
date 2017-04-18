@@ -85,6 +85,10 @@ void MainWindow::startNetworkGame(){
 	port = QInputDialog::getInt(this, tr("Server port number"),
 									tr("Server port number:"), 4000, 0, 65535 ,1, &ok);
 
+	if (ok == false){
+		return;
+	}
+
 
 	this->array->server=new Server (MAX_X, MAX_Y, port, this->array);
 

@@ -1,7 +1,7 @@
 #include "server.h"
 
 
-Server::Server (int MAX_X, int MAX_Y, int port, QObject *parent) : QObject(parent)
+Server::Server (const int &MAX_X, const int &MAX_Y, const int &port, QObject *parent) : QObject(parent)
 {
 	this->socket=NULL;
 	this->port=port;
@@ -148,7 +148,7 @@ bool Server::readFromClient () //cte z daneho sitoveho socketu
 	return false;
 }
 
-bool Server::writeToClient (QString output)
+bool Server::writeToClient (const QString &output)
 {
 	if(!socket->isValid() || !socket || !socket->isOpen()){//kontrola otevrenosti a validity socketu
 		return false;
@@ -164,7 +164,7 @@ bool Server::writeToClient (QString output)
 	}
 }
 
-int Server::MsgDialog (QString message)
+int Server::MsgDialog (const QString &message)
 {
 	QMessageBox msgBox;
 	msgBox.setText(message);

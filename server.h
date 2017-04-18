@@ -41,8 +41,8 @@ public:
 	 *
 	 */
 
-	explicit Server (int MAX_X, int MAX_Y, int port, QObject *parent = NULL);
-	bool writeToClient (QString output);
+	explicit Server (const int &MAX_X, const int &MAX_Y, const int &port, QObject *parent = NULL);
+	bool writeToClient (const QString &output);
 	bool start ();
 
 signals:
@@ -78,7 +78,7 @@ signals:
 	 *
 	 */
 
-	void move (int, int);
+	void move (const int &, const int &);
 	void connectionStatus (int);
 	void reset_net (void);
 	void NewGamePressed (int);
@@ -101,8 +101,8 @@ public slots:
 	 *
 	 */
 
-	void clientService();
-	void handleClient();
+	void clientService(void);
+	void handleClient(void);
 	void dropConnection (void);
 
 
@@ -149,10 +149,10 @@ private:
 	 *  \brief ukazatel na server
 	 *
 	 */
-	bool readFromClient ();
-	bool parseMessage ();
+	bool readFromClient (void);
+	bool parseMessage (void);
 
-	int MsgDialog (QString);
+	int MsgDialog (const QString &);
 
 	int code;
 	QString buffer;
