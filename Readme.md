@@ -16,7 +16,6 @@
 
 ```
 sudo apt-get install libqtgui4 libqtcore4 libqt4-network 
-
 ```
 
 ### Compilation Dependencies on Debian, Ubuntu (for Qt4)
@@ -26,7 +25,6 @@ sudo apt-get install libqtgui4 libqtcore4 libqt4-network
 
 ```
 sudo apt-get install qt4-qmake libqt4-dev build-essential
-
 ```
 
 ## Compilation
