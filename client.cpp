@@ -144,7 +144,7 @@ bool Client::readFromServer ()
 
 bool Client::writeToServer (QString output)
 {
-	if(!this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
+	if(this->socket != NULL && !this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
 		return false;
 	}
 	this->socket->write (output.toAscii());

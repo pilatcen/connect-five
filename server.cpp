@@ -150,7 +150,7 @@ bool Server::readFromClient () //cte z daneho sitoveho socketu
 
 bool Server::writeToClient (const QString &output)
 {
-	if(!this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
+	if(this->socket != NULL && !this->socket->isValid() || !this->socket || !this->socket->isOpen()){//kontrola otevrenosti a validity socketu
 		return false;
 	}
 

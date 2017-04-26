@@ -10,16 +10,18 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 	this->cross=new QPixmap (":/images/black.png");
 	this->empty=new QPixmap (":/images/empty.png");
 
-	this->setMinimumSize(26*MAX_X+80,26*MAX_Y+100);
+	this->setMinimumSize(26*MAX_X+80,26*MAX_Y+110);
 	this->array=new Board (argv, argc, empty, circle, cross, this);
 	this->ui->gridLayout->addWidget(array,2,0);
 	this->ui->gridLayout->setRowMinimumHeight (2, 26*MAX_Y);
 	this->ui->gridLayout->setColumnMinimumWidth(0, 26*MAX_X);
 	this->ui->label_turn->setFixedHeight(25);
+	this->ui->label_turn->setFixedWidth(25);
 	this->ui->label_color->setFixedHeight(25);
+	this->ui->label_color->setFixedWidth(25);
 	this->ui->label_turn->setScaledContents(1);
 	this->ui->label_color->setScaledContents(1);
-	this->ui->pushButton->setMaximumWidth(100);
+	//this->ui->pushButton->setMaximumWidth(100);
 
 	this->ui->label_score->setAlignment(Qt::AlignCenter);
 	this->ui->label_score_black->setAlignment(Qt::AlignCenter);
@@ -37,14 +39,13 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 		this->setWindowTitle("Connect Five Game");
 	}
 
-	connect (array, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (const int&)));
-	connect (ui->pushButton, SIGNAL (clicked ()), array, SLOT (reset ()));
-	connect (array, SIGNAL (NewGamePressed (int)), this, SLOT (buttonPressHandle (int)));
-	connect (ui->pushButton_moveBack, SIGNAL (clicked ()), array, SLOT (moveBackClicked (void)));
+	connect (this->array, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (const int&)));
+	connect (this->array, SIGNAL (NewGamePressed (int)), this, SLOT (buttonPressHandle (int)));
 
-
-	connect (ui->actionNew_Network_Game, SIGNAL (triggered ()), this, SLOT (startNetworkGame()));
-	connect (ui->actionConnect_to_Game, SIGNAL (triggered ()), this, SLOT (ConnectToGame ()));
+	connect (this->ui->actionMove_Back_2, SIGNAL (triggered ()), this->array, SLOT (moveBackClicked (void)));
+	connect (this->ui->actionReset_Game, SIGNAL (triggered ()), this->array, SLOT (reset ()));
+	connect (this->ui->actionNew_Network_Game, SIGNAL (triggered ()), this, SLOT (startNetworkGame()));
+	connect (this->ui->actionConnect_to_Game, SIGNAL (triggered ()), this, SLOT (ConnectToGame ()));
 
 	if (this->array->server){
 		this->setStatusBar (2);
@@ -54,14 +55,6 @@ MainWindow::MainWindow(char *argv[], int argc, QWidget *parent) : QMainWindow (p
 		this->displayStatus(this->array->activeType);
 	}
 
-	//zobrazeni, kdo ma jakou barvu
-	if (this->array->gameType==Board::TYPE_SERVER){
-		this->ui->label_3->setText ("You are ");
-		this->ui->label_color->setPixmap (*circle);
-	}else if (this->array->gameType==Board::TYPE_CLIENT){
-		this->ui->label_color->setPixmap (*cross);
-		this->ui->label_3->setText ("You are ");
-	}
 }
 
 void MainWindow::startNetworkGame(){
@@ -109,6 +102,9 @@ void MainWindow::startNetworkGame(){
 	connect (this->array->server, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
 	connect (this->array->server, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
 	connect (this->array->server, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+
+	this->ui->label_3->setText ("You are ");
+	this->ui->label_color->setPixmap (*circle);
 
 }
 
@@ -162,6 +158,9 @@ void MainWindow::ConnectToGame(){
 		connect (this->array->client, SIGNAL (connectionStatus (int)), this, SLOT (setStatusBar (int)));//potrebuju ukazat na statusbaru ze se nekdo pripojil/odpojil atd
 		connect (this->array->client, SIGNAL (buttonPressed (int)), this, SLOT (buttonPressHandle (int)));
 		connect (this->array->client, SIGNAL (statusChanged (int)), this, SLOT (displayStatus (int)));
+
+		this->ui->label_color->setPixmap (*cross);
+		this->ui->label_3->setText ("You are ");
 	}
 }
 
@@ -182,7 +181,7 @@ void MainWindow::setStatusBar (const int &x)
 		}else{
 			this->ui->label_turn->setPixmap (*cross);
 		}
-		this->ui->label_2->setText (" plays");
+		this->ui->label_2->setText ("Plays ");
 
 		break;
 	case 2:
@@ -222,11 +221,11 @@ void MainWindow::displayStatus (const int &event)
 	switch (event){
 	case 1:
 		this->ui->label_turn->setPixmap (*circle);
-		this->ui->label_2->setText (" plays");
+		this->ui->label_2->setText ("Plays ");
 		break;
 	case 2:
 		this->ui->label_turn->setPixmap (*cross);
-		this->ui->label_2->setText (" plays");
+		this->ui->label_2->setText ("Plays ");
 		break;
 	case 7:
 		this->ui->statusBar->showMessage ("");
@@ -245,17 +244,22 @@ void MainWindow::displayStatus (const int &event)
 		break;
 	default:
 		//ui->label->setPixmap(empty);
-		this->ui->label_turn->setText ("Game Over");
+		//this->ui->label_turn->setText ("Game Over");
+		this->ui->label_turn->clear();
 		this->ui->label_2->clear ();
-		//ui->label_3->clear();
+		this->ui->label_6->setText ("Game Over");
+		this->ui->label_3->clear();
 		this->setStatusBar (event);
 	}
 }
 
 void MainWindow::buttonPressHandle (const int &x)
 {
-	this->ui->pushButton->setEnabled ((bool)x);
-	this->ui->pushButton_moveBack->setEnabled ((bool)x);
+	//this->ui->pushButton->setEnabled ((bool)x);
+	//this->ui->pushButton_moveBack->setEnabled ((bool)x);
+
+	this->ui->actionMove_Back_2->setEnabled ((bool)x);
+	this->ui->actionReset_Game->setEnabled ((bool)x);
 }
 
 MainWindow::~MainWindow ()
