@@ -3,7 +3,7 @@
 ![Connect five](/images/connect-five.png) 
 
 ### Features
-* 2 players
+* 2 human players
 * Network game
 * simple Qt gui
 
