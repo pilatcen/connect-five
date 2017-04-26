@@ -20,10 +20,13 @@
 * build-essential
 
 ## Compilation
-* make
+```
+git clone https://github.com/pilatcen/connect-five.git
+cd connect-five
+make
+```
 
 ## Run
-* 2 players on one PC:
 ```
 ./piskvorky
 ```
